@@ -72,19 +72,20 @@
 
 (def pos [my-map 0 0 0])
 
-(defn sled [[my-map x y trees]]
-  (let [x (+ x 3)
-        y (+ y 1)
-        tree? (tree? my-map x y)]
-    (cond
-      (nil? tree?)
-      (reduced trees)
+(defn make-sled [[slope-x slope-y]]
+  (fn [[my-map x y trees]]
+    (let [x (+ x slope-x)
+          y (+ y slope-y)
+          tree? (tree? my-map x y)]
+      (cond
+        (nil? tree?)
+        (reduced trees)
 
-      (true? tree?)
-      [my-map x y (inc trees)]
+        (true? tree?)
+        [my-map x y (inc trees)]
 
-      :else
-      [my-map x y trees])))
+        :else
+        [my-map x y trees]))))
 
 (-> pos
     sled
@@ -109,4 +110,24 @@
 
 @(first (drop-while
   (complement reduced?)
-  (iterate sled [(input->map input) 0 0 0])))
+  (iterate (make-sled [3 1]) [(input->map input) 0 0 0])))
+;; => 276
+
+(def slopes
+  [[1 1]
+   [3 1]
+   [5 1]
+   [7 1]
+   [1 2]])
+
+(defn count-trees [slope]
+  @(first (drop-while
+           (complement reduced?)
+           (iterate (make-sled slope) [(input->map input) 0 0 0])))
+  )
+
+(reduce *
+        (map #(count-trees %)
+             slopes)
+        )
+;; => 7812180000
