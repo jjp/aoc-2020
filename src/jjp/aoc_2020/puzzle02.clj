@@ -75,3 +75,32 @@
      (map #(str/split % #":" )
           (map #(str/replace % #"(\d+)-(\d+) (\w): (\w)" "$1:$2:$3:$4") input)))))
 ;; => 558
+
+;; Lambda Island solution
+
+;; interesting things - use re-find and track how <= works!
+;; look at not= for an exclusive or
+(defn parse-long [l]
+  (Long/parseLong l))
+
+(defn parse-line [s]
+  (let [[ _ min max char pwd] (re-find #"(\d+)-(\d+) (.): (.*)" s)]
+    [(parse-long min) (parse-long max) (first char) pwd]))
+
+(defn entry-ok? [[min max char pwd]]
+  (<= min (get (frequencies pwd) char 0) max)
+  )
+
+(defn entry-ok2? [[min max char pwd]]
+  (let [ok1 (= (nth pwd (dec min)) char)
+        ok2 (= (nth pwd (dec max)) char)]
+    (not= ok1 ok2)))
+
+
+(count (filter identity (map entry-ok? (-> input
+                   (->> (map parse-line))))))
+;; => 536
+
+(count (filter identity (map entry-ok2? (-> input
+                                           (->> (map parse-line))))))
+;; => 558
