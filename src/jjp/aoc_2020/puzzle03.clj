@@ -126,8 +126,8 @@
            (iterate (make-sled slope) [(input->map input) 0 0 0])))
   )
 
-(reduce *
-        (map #(count-trees %)
-             slopes)
-        )
+(time (reduce *
+         (map #(count-trees %)
+              slopes)
+         ))
 ;; => 7812180000
