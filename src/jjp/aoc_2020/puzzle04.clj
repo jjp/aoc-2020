@@ -27,7 +27,7 @@ hgt:179cm
 hcl:#cfa07d eyr:2025 pid:166559648
 iyr:2011 ecl:brn hgt:59in")
 
-(def input
+(def real-input
   (slurp (io/reader (io/resource "puzzle_input04.txt")))
   )
 
@@ -50,7 +50,7 @@ iyr:2011 ecl:brn hgt:59in")
     )
   )
 
-(count (filter identity (map valid-1? (input->map input))))
+(count (filter identity (map valid-1? (input->map real-input))))
 ;; => 190
 
 ;; part 2
@@ -95,5 +95,50 @@ pid:3556412378 byr:2007")
 
 (map #(s/valid? ::passport %) (input->map invalid-input))
 
-(count (filter identity (map #(s/valid? ::passport %) (input->map input))))
+(count (filter identity (map #(s/valid? ::passport %) (input->map real-input))))
 ;; => 121
+
+;; lambda-island approach
+(defn parse-entry [entry]
+  (into {} (map (comp vec next)) (re-seq #"(\w{3}):(\S+)" entry)))
+
+(defn parse-long [l]
+  (Long/parseLong l))
+
+(defn valid? [m]
+  (= (count (dissoc m "cid")) 7))
+
+(->> (str/split demo-input #"\R\R")
+     (map parse-entry)
+     (filter valid?)
+     count)
+
+;; byr (Birth Year) - four digits; at least 1920 and at most 2002.
+;; iyr (Issue Year) - four digits; at least 2010 and at most 2020.
+;; eyr (Expiration Year) - four digits; at least 2020 and at most 2030.
+;; hgt (Height) - a number followed by either cm or in:
+;; If cm, the number must be at least 150 and at most 193.
+;; If in, the number must be at least 59 and at most 76.
+;; hcl (Hair Color) - a # followed by exactly six characters 0-9 or a-f.
+;; ecl (Eye Color) - exactly one of:
+;; pid (Passport ID) - a nine-digit number, including leading zeroes.
+;; cid (Country ID) - ignored, missing or not.
+
+(defn valid2? [{:strs [byr iyr eyr hgt hcl ecl pid cid]}]
+  (and
+   byr (<= 1920 (parse-long byr) 2002)
+   iyr (<= 2010 (parse-long iyr) 2020)
+   eyr (<= 2020 (parse-long eyr) 2030)
+   hgt (let [[_ num unit] (re-find #"(\d+)(in|cm)" hgt)]
+         (case unit
+           "cm" (<= 150 (parse-long num) 193)
+           "in" (<= 59 (parse-long num) 76)
+           false))
+   hcl (re-find #"^#[0-9a-f]{6}$" hcl)
+   ecl (#{"amb" "blu" "brn" "gry" "grn" "hzl" "oth"} ecl)
+   pid (re-find #"^\d{9}$" pid)))
+
+(->> (str/split real-input #"\R\R")
+     (map parse-entry)
+     (filter valid2?)
+     count)
