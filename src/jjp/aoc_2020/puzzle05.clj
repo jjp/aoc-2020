@@ -62,3 +62,27 @@
    (set/difference all-seats seated)
    ))
 ;; => #{653}
+
+;; Lambda Island - realizes that BFFFBBR LRL are just binary numbers
+(def chars {\F 0 \B 1 \L 0 \R 1})
+
+(let [[row col] (partition-all 7 "BFFFBBFRRR")]
+  #_ (Long/parseLong (apply str (map chars row)) 2)
+  )
+
+;; bit math using reduce - I need to read up on reduce approach
+(defn bits->num [bits]
+  (reduce #(+ (* %1 2) %2) 0 (map chars bits)))
+
+(def seat-ids (map bits->num (str/split-lines real-input)))
+
+(apply max seat-ids)
+;; => 951
+
+;; this uses partition-all to build a "sliding-window over seat-ids
+;; then when we find a gap of 2 between l and h, return l+1
+(some (fn [[l h]]
+        (when (= h (+ 2 l))
+          (inc l)))
+      (partition-all 2 1 (sort seat-ids)))
+;; => 653
