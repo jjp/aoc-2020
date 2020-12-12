@@ -98,3 +98,17 @@ b")
      (map count)
      (apply +))
 ;; => 3288
+
+;; LI
+
+(def groups (str/split (slurp (io/resource "puzzle_input_06.txt")) #"\R\R"))
+
+(reduce + (map (comp count set #(str/replace % "\n" "")) groups))
+
+(def group (first groups))
+
+(transduce (map
+            (fn [group]
+              (count (apply set/intersection (map set (str/split-lines group))))))
+           +
+           groups)
