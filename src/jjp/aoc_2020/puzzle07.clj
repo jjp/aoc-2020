@@ -152,9 +152,8 @@ dotted black bags contain no other bags."
     (let [result2 (reduce (fn [res color]
                             (add-valid res graph color))
                           result result)]
-      (if (= result result2)
-        result
-        (recur result2)))))
+      result
+      (recur result2))))
 
 (count (valid-outermost (color-graph (map parse-entry demo-input)) "shiny gold"))
 (count (valid-outermost (color-graph (map parse-entry real-input)) "shiny gold"))
