@@ -27,14 +27,23 @@
   (let [instructions  (map (fn [[i a]] [i (Long/parseLong a)]) instructions)
         index (range 0 (count instructions))
         ]
-    (into {} (map vec (partition 2 (interleave index instructions))))
-    ;; (map vec (partition 2 (interleave index instructions)))
+    ;; (into {} (map vec (partition 2 (interleave index instructions))))
+    (into [] (map vec (partition 2 (interleave index instructions))))
     ))
 
 (map #(str/split % #" " ) demo-input)
 
 (def program (compile (map #(str/split % #" " ) demo-input)))
-
+program
+;; => ([0 ["nop" 0]]
+;;     [1 ["acc" 1]]
+;;     [2 ["jmp" 4]]
+;;     [3 ["acc" 3]]
+;;     [4 ["jmp" -3]]
+;;     [5 ["acc" -99]]
+;;     [6 ["acc" 1]]
+;;     [7 ["jmp" -4]]
+;;     [8 ["acc" 6]])
 ;; => {0 ["nop" 0],
 ;;     7 ["jmp" -4],
 ;;     1 ["acc" 1],
@@ -52,9 +61,10 @@
          adr 0]
     (if (or  (contains? seen adr)
              (nil? adr)
-             (not (contains? program adr)))
+             (not (<= 0 adr (dec (count program))))
+             )
       [stack acc]
-      (let [[op arg] (get program adr)
+      (let [ [_ [op arg]] (nth program adr)
             seen (conj seen adr)
             stack (conj stack adr)
             [acc adr] (case op
@@ -71,10 +81,12 @@
 
 (def demo-program (compile (map #(str/split % #" " ) demo-input)))
 
+(count demo-program)
+(nth demo-program 0)
 (let [[stack acc](validate-last-accum demo-program )]
    [(last stack) acc] )
 ;; => [4 5]
-(def fixed-demo-program (assoc demo-program 7 ["nop" -4]))
+(def fixed-demo-program (assoc demo-program 7 [7 ["nop" -4]]))
 (let [[stack acc](validate-last-accum fixed-demo-program )]
   [(last stack) acc] )
 
