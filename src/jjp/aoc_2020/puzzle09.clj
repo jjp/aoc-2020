@@ -65,3 +65,28 @@
 
 (filter #(false? (last %))(map valid? (map reverse (partition 26 1 real-input ))))
 ;; => ([393911906 false])
+
+(def demo-sum 127)
+(def real-sum 393911906)
+
+
+(defn find-range-sums [t s input]
+  (let [found (first (filter #(= t (reduce + %)) (partition s 1 input)))]
+    (if (empty? found)
+      nil
+      (+ (apply min found) (apply max found))
+      )
+    )
+  )
+
+(first '(1 2))
+
+(defn find-range [sum input]
+  (let [sizes (range 2 (count input))]
+    (map #(find-range-sums sum % input ) sizes)
+    ))
+
+(time (filter identity (find-range demo-sum demo-input)))
+;; => (62)
+(time (filter identity (find-range real-sum real-input)))
+;; => (59341885)
