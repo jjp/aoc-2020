@@ -53,3 +53,64 @@
 
 (apply * (map inc (vals (frequencies (map #(Math/abs (apply - %)) (partition 2 1 real-input))))))
 ;; => 2738
+
+
+(defn cv [set]
+  (count (for [x [(first set)]
+               y set
+               :when (and (not= x y)
+                          (<= (Math/abs (- x y)) 3))]
+           [x y]
+           )))
+
+
+(def sets-1 (partition 4 1 (concat [0] demo-1-input [(+ 3 (last demo-1-input))] )))
+(def sets-2 (partition 4 1 (concat [0] demo-2-input [(+ 3 (last demo-2-input))] )))
+
+;; => ((1 4 5 6)
+;;     (4 5 6 7)
+;;     (5 6 7 10)
+;;     (6 7 10 11)
+;;     (7 10 11 12)
+;;     (10 11 12 15)
+;;     (11 12 15 16)
+;;     (12 15 16 19))
+(let [sets sets-1 ]
+  (apply + (map cv sets))
+  )
+
+sets-1
+(apply + (map cv sets-2))
+;; => (([0 1])
+;;     ([1 4])
+;;     ([4 5] [4 6] [4 7])
+;;     ([5 6] [5 7])
+;;     ([6 7])
+;;     ([7 10])
+;;     ([10 11] [10 12])
+;;     ([11 12])
+;;     ([12 15])
+;;     ([15 16]))
+
+;; => (([0 1])
+;;     ([1 4])
+;;     ([4 5] [4 6] [4 7])
+;;     ([5 6] [5 7])
+;;     ([6 7])
+;;     ([7 10])
+;;     ([10 11] [10 12])
+;;     ([11 12])
+;;     ([12 15])
+;;     ([15 16]))
+
+
+(defn part1 [input ]
+  (->> (conj input 0 (+ 3 (apply max input)))
+       sort
+       (partition 2 1)
+       (map #(- (second %) (first %)))
+       frequencies
+       vals
+       (apply *)))
+(part1 real-input)
+;; => 2738
