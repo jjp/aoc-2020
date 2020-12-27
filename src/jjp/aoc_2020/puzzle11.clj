@@ -15,7 +15,7 @@ L.LLLLL.LL" #"\n"))
 
 (defn parse-input [input]
   (mapv (fn [row]
-          (mapv {\L :empty \. :floor \# :occupied} row))
+          (mapv {\L :emp \. :flo \# :occ} row))
         input))
 
 (def real-input (str/split (slurp (util/puzzle-input 11)) #"\n"))
@@ -34,22 +34,22 @@ L.LLLLL.LL" #"\n"))
   )
 
 (defn next-empty [b r c]
-  (if (= (count-surrounding :occupied b r c) 0)
-    :occupied
-    :empty)
+  (if (= (count-surrounding :occ b r c) 0)
+    :occ
+    :emp)
   )
 
 (defn next-occupied [b r c]
-  (if (>= (count-surrounding :occupied b r c) 4)
-    :empty
-    :occupied)
+  (if (>= (count-surrounding :occ b r c) 4)
+    :emp
+    :occ)
   )
 
 (defn next-seat-state [b r c]
   (case (get-in b [r c])
-    :floor :floor
-    :empty (next-empty b r c)
-    :occupied (next-occupied b r c))
+    :flo :flo
+    :emp (next-empty b r c)
+    :occ (next-occupied b r c))
 )
 
 (defn next-row-state [b r]
@@ -85,7 +85,7 @@ L.LLLLL.LL" #"\n"))
 
 (defn display [input]
   (mapv (fn [row]
-          (str/join (mapv {:empty \L :floor \. :occupied \# } row)))
+          (str/join (mapv {:emp \L :flo \. :occ \# } row)))
         input))
 
 (defn play [input]
@@ -99,7 +99,7 @@ L.LLLLL.LL" #"\n"))
   )
 
 
-(->> (play (parse-input real-input))
+(->> (play (parse-input demo-input))
      flatten
      (filter #(= :occupied %))
      count
