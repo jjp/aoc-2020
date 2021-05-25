@@ -99,9 +99,9 @@ L.LLLLL.LL" #"\n"))
   )
 
 
-(->> (play (parse-input demo-input))
+(->> (play (parse-input real-input))
      flatten
-     (filter #(= :occupied %))
+     (filter #(= :occ %))
      count
      )
 ;; => 2265

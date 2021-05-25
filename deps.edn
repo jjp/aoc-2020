@@ -1,2 +1,3 @@
 {:paths ["src" "resources"]
- :deps {hashp/hashp {:mvn/version "0.1.1"}}}
+ :deps {hashp/hashp {:mvn/version "0.1.1"}
+        metosin/malli {:mvn/version "0.2.1"}}}
